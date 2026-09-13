@@ -17,3 +17,10 @@ class UserError extends UserState {
 
   UserError(this.message);
 }
+
+class UserLoadMoreError extends UserState {
+  final List<UserModel> users;
+  final String message;
+
+  UserLoadMoreError(this.users, this.message);
+}

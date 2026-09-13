@@ -10,6 +10,8 @@ Future<void> main() async {
 
   await Hive.initFlutter();
   await Hive.openBox('usersBox');
+  // await Hive.box('usersBox').clear(); // TEMPORARY
+
 
   setupDependencies();
 

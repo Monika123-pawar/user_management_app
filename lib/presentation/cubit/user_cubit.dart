@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+
 import '../../data/models/user_model.dart';
 import '../../data/repositories/user_repository.dart';
 import '../states/user_state.dart';
@@ -11,15 +12,18 @@ class UserCubit extends Cubit<UserState> {
 
   int currentPage = 1;
   int totalPages = 1;
+
   List<UserModel> allUsers = [];
+
+  bool isLoadingMore = false;
 
   Future<void> getUsers() async {
     emit(UserLoading());
 
-    final hasInternet =
-    await InternetConnection().hasInternetAccess;
-
     try {
+      final hasInternet =
+      await InternetConnection().hasInternetAccess;
+
       if (hasInternet) {
         currentPage = 1;
 
@@ -27,76 +31,96 @@ class UserCubit extends Cubit<UserState> {
           page: currentPage,
         );
 
-        totalPages = response.totalPages;
+        totalPages = response.totalPages ?? 1;
         allUsers = response.users;
 
         emit(UserSuccess(allUsers));
       } else {
-        // If no internet then get data from cached users
-        final cachedUsers = await repository.getCachedUsers();
-
-        if (cachedUsers != null) {
-          totalPages = cachedUsers.totalPages;
-          allUsers = cachedUsers.users;
-
-          emit(UserSuccess(allUsers));
-        } else {
-          emit(UserError('No internet connection'));
-        }
+        await _loadFromCache();
       }
     } catch (e) {
-      // If api failed then get data from cached users
-      final cachedUsers = await repository.getCachedUsers();
+      await _loadFromCache();
+    }
+  }
 
-      if (cachedUsers != null) {
-        totalPages = cachedUsers.totalPages;
-        allUsers = cachedUsers.users;
+  Future<void> _loadFromCache() async {
+    final cachedUsers = await repository.getCachedUsers();
 
-        emit(UserSuccess(allUsers));
-      } else {
-        emit(
-          UserError(
-            'Something went wrong. Please try again.',
-          ),
-        );
-      }
+    if (cachedUsers != null) {
+      totalPages = cachedUsers.totalPages ?? 1;
+      allUsers = cachedUsers.users;
+
+      emit(UserSuccess(allUsers));
+    } else {
+      emit(
+        UserError(
+          'Something went wrong. Please try again.',
+        ),
+      );
     }
   }
 
   Future<void> loadMoreUsers() async {
-    if (currentPage >= totalPages) {
+    if (isLoadingMore || currentPage >= totalPages) {
+      print(
+        'Pagination stopped: '
+            'currentPage=$currentPage, totalPages=$totalPages',
+      );
       return;
     }
 
+    isLoadingMore = true;
+
     try {
+      final nextPage = currentPage + 1;
+
+      print('Loading page: $nextPage');
+
       final response = await repository.getUsers(
-        page: currentPage + 1,
+        page: nextPage,
       );
 
-      currentPage++;
+      print(
+        'Received ${response.users.length} users '
+            'from page $nextPage',
+      );
 
-      allUsers = [
-        ...allUsers,
-        ...response.users,
-      ];
+      if (response.users.isNotEmpty) {
+        currentPage = nextPage;
 
-      emit(UserSuccess(allUsers));
+        allUsers = [
+          ...allUsers,
+          ...response.users,
+        ];
+
+        emit(UserSuccess(allUsers));
+      }
     } catch (e) {
-      // Load more error handled later
+      print('Pagination error: $e');
+
+      emit(
+        UserLoadMoreError(
+          allUsers,
+          'Failed to load more users',
+        ),
+      );
+    } finally {
+      isLoadingMore = false;
     }
   }
 
   void searchUsers(String query) {
-    if (query.trim().isEmpty) {
+    final searchText = query.trim().toLowerCase();
+
+    if (searchText.isEmpty) {
       emit(UserSuccess(allUsers));
       return;
     }
 
-    final searchText = query.trim().toLowerCase();
-
     final filteredUsers = allUsers.where((user) {
       final name =
-      '${user.firstName} ${user.lastName}'.toLowerCase();
+      '${user.firstName ?? ''} ${user.lastName ?? ''}'
+          .toLowerCase();
 
       return name.contains(searchText);
     }).toList();

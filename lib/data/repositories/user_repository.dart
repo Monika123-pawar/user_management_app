@@ -8,7 +8,7 @@ class UserRepository {
 
   Future<UserResponseModel> getUsers({
     required int page,
-    int perPage = 6,
+    int perPage = 10,
   }) {
     return dataSource.getUsers(
       page: page,
