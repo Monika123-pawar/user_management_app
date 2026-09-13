@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user_management_app/presentation/screens/user_detail_screen.dart';
-
 import '../cubit/user_cubit.dart';
 import '../states/user_state.dart';
 
@@ -21,9 +20,7 @@ class _UserListScreenState extends State<UserListScreen> {
   @override
   void initState() {
     super.initState();
-
     context.read<UserCubit>().getUsers();
-
     _scrollController.addListener(_onScroll);
   }
 
@@ -31,14 +28,11 @@ class _UserListScreenState extends State<UserListScreen> {
     if (!_scrollController.hasClients) {
       return;
     }
-
     // Don't paginate while searching
     if (_searchController.text.trim().isNotEmpty) {
       return;
     }
-
     final position = _scrollController.position;
-
     // Load next page near bottom
     if (position.pixels >= position.maxScrollExtent - 120) {
       context.read<UserCubit>().loadMoreUsers();
@@ -180,10 +174,8 @@ class _UserListScreenState extends State<UserListScreen> {
     String? loadMoreError,
   }) {
     final cubit = context.read<UserCubit>();
-
     final bool isSearching =
         _searchController.text.trim().isNotEmpty;
-
     final bool hasMorePages =
         cubit.currentPage < cubit.totalPages;
 
@@ -222,22 +214,10 @@ class _UserListScreenState extends State<UserListScreen> {
                 );
               },
 
-              // Index + profile image
+              //  profile image
               leading: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(
-                    width: 30,
-                    child: Text(
-                      '${index + 1}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 8),
-
                   CircleAvatar(
                     radius: 28,
                     child: user.avatar != null &&

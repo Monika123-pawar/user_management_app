@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-
 import '../../data/models/user_model.dart';
 import '../../data/repositories/user_repository.dart';
 import '../states/user_state.dart';
@@ -62,10 +61,6 @@ class UserCubit extends Cubit<UserState> {
 
   Future<void> loadMoreUsers() async {
     if (isLoadingMore || currentPage >= totalPages) {
-      print(
-        'Pagination stopped: '
-            'currentPage=$currentPage, totalPages=$totalPages',
-      );
       return;
     }
 
@@ -74,15 +69,8 @@ class UserCubit extends Cubit<UserState> {
     try {
       final nextPage = currentPage + 1;
 
-      print('Loading page: $nextPage');
-
       final response = await repository.getUsers(
         page: nextPage,
-      );
-
-      print(
-        'Received ${response.users.length} users '
-            'from page $nextPage',
       );
 
       if (response.users.isNotEmpty) {
@@ -96,8 +84,6 @@ class UserCubit extends Cubit<UserState> {
         emit(UserSuccess(allUsers));
       }
     } catch (e) {
-      print('Pagination error: $e');
-
       emit(
         UserLoadMoreError(
           allUsers,

@@ -1,7 +1,6 @@
 name: user_management_app
-description: "A new Flutter project."
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
+description: "A Flutter application that fetches and displays users from the ReqRes API with pagination, infinite scrolling, search, caching, pull-to-refresh, error handling, and user details.."
+
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1
@@ -20,14 +19,14 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   internet_connection_checker_plus: ^3.1.2
-  mocktail: ^1.0.5
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^6.0.0
-
+  mocktail: ^1.0.5
 
 flutter:
 

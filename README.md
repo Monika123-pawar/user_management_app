@@ -1,17 +1,70 @@
 # user_management_app
 
-A new Flutter project.
+A Flutter application that fetches and displays users from the ReqRes API with pagination, infinite scrolling, search, caching, pull-to-refresh, error handling, and user details.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- User list with profile pictures
+- User details
+- Search users by name
+- Pagination & infinite scrolling
+- Pull-to-refresh
+- Error & retry handling
+- Offline caching with Hive
+- 30-minute cache expiry
+- Responsive UI
+- Cubit state management
+- Dio API integration
+- GetIt dependency injection
+- Unit tests
 
-A few resources to get you started if this is your first Flutter project:
+## Tech Stack
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- Flutter & Dart
+- BLoC / Cubit
+- Dio
+- Hive
+- GetIt
+- Mocktail
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## API
+
+`https://reqres.in/api/users`
+
+Pagination:
+
+`?per_page=10&page=1`
+
+## Architecture
+
+The project follows a clean architecture approach:
+
+```text
+UI
+ ↓
+Cubit
+ ↓
+Repository
+ ↓
+DataSource
+ ↓
+Dio → API
+````
+
+## Run
+
+```
+flutter pub get
+flutter run
+```
+
+## Test
+
+```
+flutter test
+```
+
+## GitHub
+
+https://github.com/Monika123-pawar/user_management_app
+
